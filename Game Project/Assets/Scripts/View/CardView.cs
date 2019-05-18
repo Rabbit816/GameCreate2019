@@ -5,31 +5,41 @@ using UnityEngine.UI;
 
 public class CardView : MonoBehaviour
 {
-    [SerializeField]
-    private int cardId;
-    public int CardId { set { cardId = value; } }
-    [SerializeField]
+    // カード情報
+    private int cardNumber;
+    public int CardNumber { set { cardNumber = value; } }
+    private string cardMark;
+    public string CardMark { set { cardMark = value; } }
+
+    private Sprite cardSprite;
     private Image cardImage;
-    
-    public void CardColor()
+
+    /// <summary>
+    /// カードデータをもとにカードの表示をする
+    /// </summary>
+    public void OutputCard()
     {
-        switch (cardId)
+        this.cardImage = this.gameObject.GetComponent<Image>();
+        switch (cardMark)
         {
-            case 0:
-                cardImage.color = Color.red;
+            case "スペード":
+                this.cardSprite = CardControl.Instance.SpadeCards[this.cardNumber];
                 break;
-            case 1:
-                cardImage.color = Color.blue;
+            case "クローバー":
+                this.cardSprite = CardControl.Instance.CloverCards[this.cardNumber];
                 break;
-            case 2:
-                cardImage.color = Color.yellow;
+            case "ハート":
+                this.cardSprite = CardControl.Instance.HeartCards[this.cardNumber];
                 break;
-            case 3:
-                cardImage.color = Color.green;
+            case "ダイヤ":
+                this.cardSprite = CardControl.Instance.DiaCards[this.cardNumber];
                 break;
-            case 4:
-                cardImage.color = Color.black;
+            default:
+                this.cardSprite = CardControl.Instance.CardMain;
                 break;
         }
+        this.cardImage.sprite = this.cardSprite;
+        this.cardImage.SetNativeSize();
+        this.gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 1.0f);
     }
 }
