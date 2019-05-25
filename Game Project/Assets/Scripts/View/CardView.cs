@@ -7,9 +7,11 @@ public class CardView : MonoBehaviour
 {
     // カード情報
     private int cardNumber;
-    public int CardNumber { set { cardNumber = value; } }
+    public int CardNumber { set { cardNumber = value; } get { return cardNumber; } }
     private string cardMark;
-    public string CardMark { set { cardMark = value; } }
+    public string CardMark { set { cardMark = value; } get { return cardMark; } }
+    private int cardId;
+    public int CardId { set { cardId = value; } get { return cardId; } }
 
     private Sprite cardSprite;
     private Image cardImage;
@@ -39,7 +41,5 @@ public class CardView : MonoBehaviour
                 break;
         }
         this.cardImage.sprite = this.cardSprite;
-        this.cardImage.SetNativeSize();
-        this.gameObject.transform.localScale = new Vector3(0.25f, 0.25f, 1.0f);
     }
 }
