@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4553112119455030861}
   - component: {fileID: 4553112119455030860}
   - component: {fileID: 4553112119455030835}
-  - component: {fileID: 4553112119455030862}
+  - component: {fileID: 1863340804027025858}
   m_Layer: 5
   m_Name: CardObject
   m_TagString: Untagged
@@ -118,7 +118,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
---- !u!114 &4553112119455030862
+--- !u!114 &1863340804027025858
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,6 +127,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4553112119455030833}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bcc7fafb6502fa0409c1066d72c4fe9a, type: 3}
+  m_Script: {fileID: 11500000, guid: 22a5d9b9024e9fd408732c202fc2967b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  CardId: 0
+  CardNumber: 0
+  CardMark: 

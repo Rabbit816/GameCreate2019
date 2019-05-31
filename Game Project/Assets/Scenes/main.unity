@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -492,7 +492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfae62348b848064d85f63097432d7d7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SpadeCards:
+  spadeCards:
   - {fileID: 21300000, guid: 1e9738f87c2eac343b7b5c4cd5f91275, type: 3}
   - {fileID: 21300000, guid: 60d599c12bbe1ee4b818512d68c1cd60, type: 3}
   - {fileID: 21300000, guid: 965b99054289e32489fdcb50fd95c336, type: 3}
@@ -506,7 +506,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: e0d2309986b0c14408f4d1e5a5ca1ee3, type: 3}
   - {fileID: 21300000, guid: 32e52402984654045aa8e4ce9f73b224, type: 3}
   - {fileID: 21300000, guid: f7a77d27ba52f984e9a99b94c4d434e4, type: 3}
-  CloverCards:
+  cloverCards:
   - {fileID: 21300000, guid: badac6dc5d200724d98532aac4d0ca57, type: 3}
   - {fileID: 21300000, guid: dff93c74826568448b5b8b0c845327ee, type: 3}
   - {fileID: 21300000, guid: c8c9cae6aee26004d8f01e4b48c1c403, type: 3}
@@ -520,7 +520,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 8d221154d215cdb4da38c5be1516a75a, type: 3}
   - {fileID: 21300000, guid: 1e224dfe9a58f1f42a75c28b3d1d8ae9, type: 3}
   - {fileID: 21300000, guid: 65ef61a2fb2f26a408dc8ea5cd0f0679, type: 3}
-  HeartCards:
+  heartCards:
   - {fileID: 21300000, guid: 849243fc5d5f5a54688d808f72dfd48c, type: 3}
   - {fileID: 21300000, guid: 6478366a5c6c0ac4fb9592cd73d5a355, type: 3}
   - {fileID: 21300000, guid: ef2c2c8d828c36948bd03f95d2ecc840, type: 3}
@@ -534,7 +534,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2be03a45b31154240a2ba66dd7de1711, type: 3}
   - {fileID: 21300000, guid: 52050080d04e82e49925c686264ba98b, type: 3}
   - {fileID: 21300000, guid: 57240c64aec04a54db8dad2981db5b10, type: 3}
-  DiaCards:
+  diaCards:
   - {fileID: 21300000, guid: 73aca55fa1266ed478725e9e741ea5b0, type: 3}
   - {fileID: 21300000, guid: 47c21af04616011488d22f0a43a26cda, type: 3}
   - {fileID: 21300000, guid: a7235ef59618dea4e8a888322c574fef, type: 3}
@@ -548,8 +548,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 5528ef22ba605ff4cb93fc3cb9e8e962, type: 3}
   - {fileID: 21300000, guid: 23d8327a53cb452469a7c220df137e94, type: 3}
   - {fileID: 21300000, guid: 6e5570a588c8e2644a472e63b2caa0f2, type: 3}
-  CardMain: {fileID: 21300000, guid: 42276781bded0fe40a5327c76f2212b9, type: 3}
-  cardObject: {fileID: 4553112119455030833, guid: c00cbbc815cdd884abbf0c91a46cc459,
+  cardMainSprite: {fileID: 21300000, guid: 42276781bded0fe40a5327c76f2212b9, type: 3}
+  cardObject: {fileID: 4553112119455030835, guid: c00cbbc815cdd884abbf0c91a46cc459,
     type: 3}
   allCards: {fileID: 165600472}
 --- !u!4 &1930868324

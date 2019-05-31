@@ -1,24 +1,31 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardControl : MonoBehaviour
 {
     public static CardControl Instance;
 
     // カードのImageデータ
-    public List<Sprite> SpadeCards;
-    public List<Sprite> CloverCards;
-    public List<Sprite> HeartCards;
-    public List<Sprite> DiaCards;
-    public Sprite CardMain;
+    [SerializeField]
+    private List<Sprite> spadeCards;
+    [SerializeField]
+    private List<Sprite> cloverCards;
+    [SerializeField]
+    private List<Sprite> heartCards;
+    [SerializeField]
+    private List<Sprite> diaCards;
+    [SerializeField]
+    private Sprite cardMainSprite;
+    public Sprite CardMainSprite { get { return cardMainSprite; } }
 
     // カードオブジェクトの元データ
     [SerializeField]
-    private GameObject cardObject;
+    private Button cardObject;
 
     // カードオブジェクト
-    private GameObject[] allCardObjects = new GameObject[52];
+    private Button[] allCardObjects = new Button[52];
 
     // 盤面のカードを格納しておくオブジェクト
     [SerializeField]
@@ -32,11 +39,7 @@ public class CardControl : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-        DontDestroyOnLoad(this.gameObject);
+        if(Instance == null) Instance = this;
     }
 
     private void Start()
@@ -64,39 +67,38 @@ public class CardControl : MonoBehaviour
         for(int i = 0; i < allCardObjects.Length; i++)
         {
             // インスタンスの生成
-            allCardObjects[i] = Instantiate(this.cardObject);
+            allCardObjects[i] = Instantiate(cardObject);
 
             // インスタンスに情報を割り当てる
-            var cardData = allCardObjects[i].GetComponent<CardView>();
-            var cardButton = allCardObjects[i].GetComponent<UnityEngine.UI.Button>();
+            var cardData = allCardObjects[i].GetComponent<OutputCard>();
             if (0 <= cards[i] && cards[i] < 13)
             {
                 cardData.CardNumber = cards[i];
                 cardData.CardMark = "スペード";
-                allCardObjects[i].name = cardData.CardMark + "：" + (cardData.CardNumber + 1);
+                cardData.CardSpriteData = spadeCards[cardData.CardNumber];
             }
             else if (13 <= cards[i] && cards[i] < 26)
             {
                 cardData.CardNumber = cards[i] - 13;
                 cardData.CardMark = "クローバー";
-                allCardObjects[i].name = cardData.CardMark + "：" + (cardData.CardNumber + 1);
+                cardData.CardSpriteData = cloverCards[cardData.CardNumber];
             }
             else if (26 <= cards[i] && cards[i] < 39)
             {
                 cardData.CardNumber = cards[i] - 26;
                 cardData.CardMark = "ハート";
-                allCardObjects[i].name = cardData.CardMark + "：" + (cardData.CardNumber + 1);
+                cardData.CardSpriteData = heartCards[cardData.CardNumber];
             }
             else
             {
                 cardData.CardNumber = cards[i] - 39;
                 cardData.CardMark = "ダイヤ";
-                allCardObjects[i].name = cardData.CardMark + "：" + (cardData.CardNumber + 1);
+                cardData.CardSpriteData = diaCards[cardData.CardNumber];
             }
             cardData.CardId = i;
             // カードをクリックしたら実行する処理の追加
-            cardButton.onClick.AddListener(() => cardData.OutputCard());
-            cardButton.onClick.AddListener(() => CheckCard(cardData.CardNumber));
+            allCardObjects[i].onClick.AddListener(() => cardData.OutputData());
+            allCardObjects[i].onClick.AddListener(() => CheckCard(cardData.CardNumber, cardData.CardId));
         }
 
         // オブジェクトのTransformを設定
@@ -115,12 +117,18 @@ public class CardControl : MonoBehaviour
         }        
     }
 
-    private void CheckCard(int cardNum)
+    /// <summary>
+    /// カードの正誤判定の処理
+    /// </summary>
+    /// <param name="cardNum"></param>
+    private void CheckCard(int cardNum, int cardId)
     {
+        Debug.Log(cardNum + " " + cardId);
         if (!cardCheckFlag)
         {
             cardCheckFlag = true;
             return;
         }
+        cardCheckFlag = false;
     }
 }
