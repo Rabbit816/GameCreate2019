@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class CardControl : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class CardControl : MonoBehaviour
     private List<Sprite> diaCards;
     [SerializeField]
     private Sprite cardMainSprite;
-    public Sprite CardMainSprite { get { return cardMainSprite; } }
 
     // カードオブジェクトの元データ
     [SerializeField]
@@ -36,21 +36,21 @@ public class CardControl : MonoBehaviour
 
     // カードの正誤判定
     private bool cardCheckFlag = false;
+    private List<int> cardNumList = new List<int>();
+    private List<int> cardIdList = new List<int>();
 
     private void Awake()
     {
-        if(Instance == null) Instance = this;
-    }
-
-    private void Start()
-    {
-        SetCard();
+        if(Instance == null)
+        {
+            Instance = this;
+        }
     }
 
     /// <summary>
     /// カードを画面上に並べる処理
     /// </summary>
-    private void SetCard()
+    public void SetCard()
     {
         // シャッフル用の配列の準備
         for(int i = 0; i < cards.Length; i++) cards[i] = i;
@@ -70,7 +70,8 @@ public class CardControl : MonoBehaviour
             allCardObjects[i] = Instantiate(cardObject);
 
             // インスタンスに情報を割り当てる
-            var cardData = allCardObjects[i].GetComponent<OutputCard>();
+            var cardData = allCardObjects[i].GetComponent<CardView>();
+            cardData.MainSpriteData = cardMainSprite;
             if (0 <= cards[i] && cards[i] < 13)
             {
                 cardData.CardNumber = cards[i];
@@ -123,12 +124,63 @@ public class CardControl : MonoBehaviour
     /// <param name="cardNum"></param>
     private void CheckCard(int cardNum, int cardId)
     {
-        Debug.Log(cardNum + " " + cardId);
+        cardNumList.Add(cardNum);
+        cardIdList.Add(cardId);
+
         if (!cardCheckFlag)
         {
+            allCardObjects[cardId].enabled = false;
             cardCheckFlag = true;
             return;
         }
+
+        foreach(Button button in allCardObjects)
+        {
+            button.enabled = false;    // カードのクリックを無効にする
+        }
+
+        if(cardNumList.Distinct().Count() == 1)
+        {
+            // 
+            StartCoroutine(directionToCard(0.75f, true));
+        }
+        else
+        {
+            //
+            StartCoroutine(directionToCard(0.75f, false));
+        }
+        GameMaster.Instance.GameTurn++;
         cardCheckFlag = false;
+    }
+
+    /// <summary>
+    /// めくったカードに指示を出す処理
+    /// </summary>
+    /// <param name="time">実行開始時間(秒)</param>
+    /// <param name="flag">true=消える、false=裏返す</param>
+    /// <returns></returns>
+    IEnumerator directionToCard(float time, bool flag)
+    {
+        yield return new WaitForSeconds(time);
+        for(int i = 0; i < cardIdList.Count; i++)
+        {
+            var cardData = allCardObjects[cardIdList[i]].GetComponent<CardView>();
+            if (flag)
+            {
+                cardData.RemoveCard();    // カードを非表示にする
+            }
+            else
+            {
+                cardData.ReturnCard();    // カードを裏返す
+            }
+        }
+
+        foreach(Button button in allCardObjects)
+        {
+            button.enabled = true;    // カードのクリックを有効にする
+        }
+
+        cardIdList.Clear();
+        cardNumList.Clear();
     }
 }

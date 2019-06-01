@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class OutputCard : CardData
+public class CardView : CardData
 {
     private Image cardImage;
 
@@ -25,7 +25,7 @@ public class OutputCard : CardData
     /// </summary>
     public void ReturnCard()
     {
-        cardImage.sprite = CardControl.Instance.CardMainSprite;
+        cardImage.sprite = MainSpriteData;
     }
 
     /// <summary>
