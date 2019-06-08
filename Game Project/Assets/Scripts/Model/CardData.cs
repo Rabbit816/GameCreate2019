@@ -19,7 +19,4 @@ public class CardData : MonoBehaviour
     private Sprite cardSpriteData;     // 表示するカードのスプライト画像データ
     public Sprite CardSpriteData { set { cardSpriteData = value; } get { return cardSpriteData; } }
 
-    private Sprite mainSpriteData;     // カードの裏面のスプライト画像データ
-    public Sprite MainSpriteData { set { mainSpriteData = value; } get { return mainSpriteData; } }
-
 }

@@ -14,10 +14,9 @@ public class GameMaster : MonoBehaviour
     [SerializeField, Tooltip("ターン数の上限")]
     private int limitTurn;
 
-    // フェードテクスチャ
-    private Texture2D blackTexture;
-    private float fadeAlpha = 0;
-    private bool isFading = false;
+    private int getCardCounter;    // 獲得したカードの枚数
+    public int GetCardCounter { set { getCardCounter = value; } get { return getCardCounter; } }
+
     private bool fadeStartFlag = true;
 
     private void Awake()
@@ -28,20 +27,6 @@ public class GameMaster : MonoBehaviour
         }
         gameTurn = 0;
         turnCounter.LimitTurn = limitTurn;
-
-        blackTexture = new Texture2D(32, 32, TextureFormat.RGB24, false);
-        blackTexture.ReadPixels(new Rect(0, 0, 32, 32), 0, 0, false);
-        blackTexture.SetPixel(0, 0, Color.white);
-        blackTexture.Apply();
-    }
-
-    private void OnGUI()
-    {
-        if (!isFading) return;
-
-        // 黒いテクスチャの描画
-        GUI.color = new Color(0, 0, 0, fadeAlpha);
-        GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), blackTexture);
     }
 
     private void Start()
@@ -52,35 +37,49 @@ public class GameMaster : MonoBehaviour
     private void Update()
     {
         turnCounter.GameTurn = gameTurn;
-        if(gameTurn >= limitTurn && fadeStartFlag)
+        if(getCardCounter == 52)
         {
-            StartCoroutine(FadeScene(1.5f));
+            Debug.Log("ゲームクリアしました");
+            Quit();
+        }
+        else if(gameTurn == limitTurn && fadeStartFlag)
+        {
+            StartCoroutine(Fade());
             fadeStartFlag = false;
         }
     }
 
-    private IEnumerator FadeScene(float interval)
+    private void Quit()
     {
-        isFading = true;
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#elif UNITY_STANDALONE
+    UnityEngine.Application.Quit();
+#endif
+    }
 
-        // 暗くする
-        float time = 0;
-        while (time <= interval)
+    /// <summary>
+    /// ゲームを初期化してスタート
+    /// </summary>
+    public void ResetGame()
+    {
+        gameTurn = 0;
+        getCardCounter = 0;
+        CardControl.Instance.ResetCard();
+        turnCounter.CounterOn();
+        fadeStartFlag = true;
+    }
+
+    IEnumerator Fade()
+    {
+        StartCoroutine(FadeControl.Instance.StartFadeOut());
+        while (FadeControl.Instance.IsFading)
         {
-            fadeAlpha = Mathf.Lerp(0f, 1f, time / interval);
-            time += Time.deltaTime;
-            yield return 0;
+            yield return new WaitForEndOfFrame();
         }
+        CardControl.Instance.HideCards();
+        turnCounter.CounterOff();
 
-        // 明るくする
-        time = 0;
-        while (time <= interval)
-        {
-            fadeAlpha = Mathf.Lerp(1f, 0f, time / interval);
-            time += Time.deltaTime;
-            yield return 0;
-        }
-
-        isFading = false;
+        StartCoroutine(FadeControl.Instance.StartFadeIn());
     }
 }

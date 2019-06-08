@@ -17,8 +17,6 @@ public class CardControl : MonoBehaviour
     private List<Sprite> heartCards;
     [SerializeField]
     private List<Sprite> diaCards;
-    [SerializeField]
-    private Sprite cardMainSprite;
 
     // カードオブジェクトの元データ
     [SerializeField]
@@ -26,6 +24,7 @@ public class CardControl : MonoBehaviour
 
     // カードオブジェクト
     private Button[] allCardObjects = new Button[52];
+    private CardView[] allCardView = new CardView[52];
 
     // 盤面のカードを格納しておくオブジェクト
     [SerializeField]
@@ -64,42 +63,42 @@ public class CardControl : MonoBehaviour
         }
 
         // 情報の割り当て
-        for(int i = 0; i < allCardObjects.Length; i++)
+        for(int i = 0; i < allCardView.Length; i++)
         {
             // インスタンスの生成
             allCardObjects[i] = Instantiate(cardObject);
 
             // インスタンスに情報を割り当てる
-            var cardData = allCardObjects[i].GetComponent<CardView>();
-            cardData.MainSpriteData = cardMainSprite;
+            allCardView[i] = allCardObjects[i].GetComponent<CardView>();
+            var cardView = allCardView[i];
             if (0 <= cards[i] && cards[i] < 13)
             {
-                cardData.CardNumber = cards[i];
-                cardData.CardMark = "スペード";
-                cardData.CardSpriteData = spadeCards[cardData.CardNumber];
+                cardView.CardNumber = cards[i];
+                cardView.CardMark = "スペード";
+                cardView.CardSpriteData = spadeCards[cardView.CardNumber];
             }
             else if (13 <= cards[i] && cards[i] < 26)
             {
-                cardData.CardNumber = cards[i] - 13;
-                cardData.CardMark = "クローバー";
-                cardData.CardSpriteData = cloverCards[cardData.CardNumber];
+                cardView.CardNumber = cards[i] - 13;
+                cardView.CardMark = "クローバー";
+                cardView.CardSpriteData = cloverCards[cardView.CardNumber];
             }
             else if (26 <= cards[i] && cards[i] < 39)
             {
-                cardData.CardNumber = cards[i] - 26;
-                cardData.CardMark = "ハート";
-                cardData.CardSpriteData = heartCards[cardData.CardNumber];
+                cardView.CardNumber = cards[i] - 26;
+                cardView.CardMark = "ハート";
+                cardView.CardSpriteData = heartCards[cardView.CardNumber];
             }
             else
             {
-                cardData.CardNumber = cards[i] - 39;
-                cardData.CardMark = "ダイヤ";
-                cardData.CardSpriteData = diaCards[cardData.CardNumber];
+                cardView.CardNumber = cards[i] - 39;
+                cardView.CardMark = "ダイヤ";
+                cardView.CardSpriteData = diaCards[cardView.CardNumber];
             }
-            cardData.CardId = i;
+            cardView.CardId = i;
             // カードをクリックしたら実行する処理の追加
-            allCardObjects[i].onClick.AddListener(() => cardData.OutputData());
-            allCardObjects[i].onClick.AddListener(() => CheckCard(cardData.CardNumber, cardData.CardId));
+            allCardObjects[i].onClick.AddListener(() => cardView.CardOpen());
+            allCardObjects[i].onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));
         }
 
         // オブジェクトのTransformを設定
@@ -142,15 +141,13 @@ public class CardControl : MonoBehaviour
         if(cardNumList.Distinct().Count() == 1)
         {
             // 
-            StartCoroutine(directionToCard(0.75f, true));
+            StartCoroutine(DirectionToCard(1.0f, true));
         }
         else
         {
             //
-            StartCoroutine(directionToCard(0.75f, false));
+            StartCoroutine(DirectionToCard(1.0f, false));
         }
-        GameMaster.Instance.GameTurn++;
-        cardCheckFlag = false;
     }
 
     /// <summary>
@@ -159,20 +156,25 @@ public class CardControl : MonoBehaviour
     /// <param name="time">実行開始時間(秒)</param>
     /// <param name="flag">true=消える、false=裏返す</param>
     /// <returns></returns>
-    IEnumerator directionToCard(float time, bool flag)
+    IEnumerator DirectionToCard(float time, bool flag)
     {
         yield return new WaitForSeconds(time);
         for(int i = 0; i < cardIdList.Count; i++)
         {
-            var cardData = allCardObjects[cardIdList[i]].GetComponent<CardView>();
             if (flag)
             {
-                cardData.RemoveCard();    // カードを非表示にする
+                allCardView[cardIdList[i]].RemoveCard();    // カードを非表示にする
+                GameMaster.Instance.GetCardCounter++;
             }
             else
             {
-                cardData.ReturnCard();    // カードを裏返す
+                allCardView[cardIdList[i]].CardClose();    // カードを裏返す
             }
+        }
+
+        while(allCardView[cardIdList[cardIdList.Count - cardIdList.Count]].IsCardTurning && allCardView[cardIdList.Count - 1].IsCardTurning)
+        {
+            yield return new WaitForEndOfFrame();
         }
 
         foreach(Button button in allCardObjects)
@@ -182,5 +184,82 @@ public class CardControl : MonoBehaviour
 
         cardIdList.Clear();
         cardNumList.Clear();
+        cardCheckFlag = false;
+        GameMaster.Instance.GameTurn++;
+    }
+
+    /// <summary>
+    /// 盤面のカードを全て非表示にする
+    /// </summary>
+    public void HideCards()
+    {
+        allCards.SetActive(false);
+    }
+
+    /// <summary>
+    /// カードを再配置する処理
+    /// </summary>
+    public void ResetCard()
+    {
+        for (int i = 0; i < cards.Length; i++)
+        {
+            int tmp = cards[i];
+            int index = Random.Range(0, cards.Length);
+            cards[i] = cards[index];
+            cards[index] = tmp;
+        }
+        for (int i = 0; i < allCardView.Length; i++)
+        {
+            var cardView = allCardView[i];
+            if (0 <= cards[i] && cards[i] < 13)
+            {
+                cardView.CardNumber = cards[i];
+                cardView.CardMark = "スペード";
+                cardView.CardSpriteData = spadeCards[cardView.CardNumber];
+            }
+            else if (13 <= cards[i] && cards[i] < 26)
+            {
+                cardView.CardNumber = cards[i] - 13;
+                cardView.CardMark = "クローバー";
+                cardView.CardSpriteData = cloverCards[cardView.CardNumber];
+            }
+            else if (26 <= cards[i] && cards[i] < 39)
+            {
+                cardView.CardNumber = cards[i] - 26;
+                cardView.CardMark = "ハート";
+                cardView.CardSpriteData = heartCards[cardView.CardNumber];
+            }
+            else
+            {
+                cardView.CardNumber = cards[i] - 39;
+                cardView.CardMark = "ダイヤ";
+                cardView.CardSpriteData = diaCards[cardView.CardNumber];
+            }
+        }
+
+        allCards.SetActive(true);
+
+        foreach(Button button in allCardObjects)
+        {
+            button.enabled = true;
+        }
+        foreach(CardView view in allCardView)
+        {
+            view.ResetCard();
+        }
+
+        cardCheckFlag = false;
+    }
+
+    /// <summary>
+    /// デバッグ用の処理
+    /// </summary>
+    public void DebugMode()
+    {
+        foreach(Button button in allCardObjects)
+        {
+            var cardData = button.GetComponent<CardView>();
+            cardData.CardNumber = 1;
+        }
     }
 }

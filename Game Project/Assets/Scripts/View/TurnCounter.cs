@@ -22,4 +22,14 @@ public class TurnCounter : MonoBehaviour
     {
         text.text = gameTurn.ToString() + "  /  " + limitTurn.ToString();
     }
+
+    public void CounterOn()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void CounterOff()
+    {
+        gameObject.SetActive(false);
+    }
 }

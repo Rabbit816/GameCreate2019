@@ -5,27 +5,99 @@ using UnityEngine.UI;
 
 public class CardView : CardData
 {
+    [SerializeField]
     private Image cardImage;
+    private bool isCardTurning;
+    public bool IsCardTurning { set { isCardTurning = value; } get { return isCardTurning; } }
 
-    private void Awake()
-    {
-        cardImage = gameObject.GetComponent<Image>();
-    }
-
-    /// <summary>
-    /// カードを表示する処理
-    /// </summary>
-    public void OutputData()
+    private void Update()
     {
         cardImage.sprite = CardSpriteData;
     }
 
     /// <summary>
+    /// カードを表示する処理
+    /// </summary>
+    public void CardOpen()
+    {
+        StartCoroutine(CardAction(true));
+    }
+
+    /// <summary>
     /// カードを裏返す処理
     /// </summary>
-    public void ReturnCard()
+    public void CardClose()
     {
-        cardImage.sprite = MainSpriteData;
+        StartCoroutine(CardAction(false));
+    }
+
+    private IEnumerator CardAction(bool turnMode)
+    {
+        isCardTurning = true;
+        float angle = 0f;
+        float speed = 500f;
+        bool flag = true;
+
+        if (turnMode)
+        {
+            // カードをめくる処理
+            while(angle < 180)
+            {
+                angle += speed * Time.deltaTime;
+                transform.eulerAngles = new Vector3(0, angle, 0);
+                if(angle >= 90 && flag)
+                {
+                    NumberSprite(turnMode);
+                    flag = false;
+                }
+                yield return null;
+            }
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
+        else
+        {
+            angle = 180f;
+            // めくったカードを戻す処理
+            while (angle > 0)
+            {
+                angle -= speed * Time.deltaTime;
+                transform.eulerAngles = new Vector3(0, angle, 0);
+                if (angle <= 90 && flag)
+                {
+                    NumberSprite(turnMode);
+                    flag = false;
+                }
+                yield return null;
+            }
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        isCardTurning = false;
+    }
+
+    /// <summary>
+    /// カードの数字イラストのオンオフ
+    /// </summary>
+    /// <param name="mode">true=ON, false=OFF</param>
+    private void NumberSprite(bool mode)
+    {
+        if (mode)
+        {
+            cardImage.color = new Color(cardImage.color.r, cardImage.color.g, cardImage.color.b, 1);
+        }
+        else
+        {
+            cardImage.color = new Color(cardImage.color.r, cardImage.color.g, cardImage.color.b, 0);
+        }
+    }
+
+    /// <summary>
+    /// カードの表示をゲーム開始時の状態にする
+    /// </summary>
+    public void ResetCard()
+    {
+        transform.eulerAngles = new Vector3(0, 0, 0);
+        NumberSprite(false);
+        gameObject.SetActive(true);
     }
 
     /// <summary>
@@ -33,6 +105,8 @@ public class CardView : CardData
     /// </summary>
     public void RemoveCard()
     {
+        isCardTurning = true;
         gameObject.SetActive(false);
+        isCardTurning = false;
     }
 }
