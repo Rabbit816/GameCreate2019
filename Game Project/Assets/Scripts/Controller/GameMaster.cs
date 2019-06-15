@@ -6,6 +6,10 @@ using UnityEngine.UI;
 public class GameMaster : MonoBehaviour
 {
     public static GameMaster Instance;
+    private CardControl card;
+    private FadeControl fade;
+    private ResultControl result;
+
     [SerializeField]
     private TurnCounter turnCounter;
 
@@ -16,6 +20,9 @@ public class GameMaster : MonoBehaviour
 
     private int getCardCounter;    // 獲得したカードの枚数
     public int GetCardCounter { set { getCardCounter = value; } get { return getCardCounter; } }
+
+    private float gameTime;    // 経過時間
+    public float GameTime { get { return gameTime; } }
 
     private bool fadeStartFlag = true;
 
@@ -31,25 +38,36 @@ public class GameMaster : MonoBehaviour
 
     private void Start()
     {
-        CardControl.Instance.SetCard();
+        card = CardControl.Instance;
+        fade = FadeControl.Instance;
+        result = ResultControl.Instance;
+        card.SetCard();
+        result.GameStart();
     }
 
     private void Update()
     {
         turnCounter.GameTurn = gameTurn;
-        if(getCardCounter == 52)
+        if((getCardCounter == 52 || gameTurn == limitTurn) && fadeStartFlag)
         {
-            Debug.Log("ゲームクリアしました");
-            Quit();
-        }
-        else if(gameTurn == limitTurn && fadeStartFlag)
-        {
-            StartCoroutine(Fade());
+            fade.StartFade(GameOverAction);
             fadeStartFlag = false;
+            if(getCardCounter == 52)
+            {
+                result.OutputResult(true);
+            }
+            else
+            {
+                result.OutputResult(false);
+            }
+        }
+        else
+        {
+            gameTime += Time.deltaTime;
         }
     }
 
-    private void Quit()
+    public void Quit()
     {
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -65,21 +83,20 @@ public class GameMaster : MonoBehaviour
     {
         gameTurn = 0;
         getCardCounter = 0;
-        CardControl.Instance.ResetCard();
+        gameTime = 0;
+        card.ResetCard();
         turnCounter.CounterOn();
+        result.GameStart();
         fadeStartFlag = true;
     }
 
-    IEnumerator Fade()
+    /// <summary>
+    /// GameOverになったら実行する処理
+    /// </summary>
+    private void GameOverAction()
     {
-        StartCoroutine(FadeControl.Instance.StartFadeOut());
-        while (FadeControl.Instance.IsFading)
-        {
-            yield return new WaitForEndOfFrame();
-        }
-        CardControl.Instance.HideCards();
+        card.HideCards();
         turnCounter.CounterOff();
-
-        StartCoroutine(FadeControl.Instance.StartFadeIn());
+        result.GameEnd();
     }
 }

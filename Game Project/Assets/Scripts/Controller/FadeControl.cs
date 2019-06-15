@@ -32,6 +32,7 @@ public class FadeControl : MonoBehaviour
         green = fadeImage.color.g;
         blue = fadeImage.color.b;
         alpha = fadeImage.color.a;
+        transform.SetAsLastSibling();
     }
 
     void Update()
@@ -39,31 +40,36 @@ public class FadeControl : MonoBehaviour
         SetAlpha();
     }
 
-    public IEnumerator StartFadeIn()
+    public void StartFade(UnityEngine.Events.UnityAction fadingAction)
     {
+        StartCoroutine(FadeAction(fadingAction));
+    }
+
+    private IEnumerator FadeAction(UnityEngine.Events.UnityAction fadingAction)
+    {
+        // 画面を暗くする
         isFading = true;
+        fadeImage.enabled = true;
         time = 0;
-        while(time <= interval)
+        while (time <= interval)
+        {
+            alpha = Mathf.Lerp(0f, 1f, time / interval);
+            time += Time.deltaTime;
+            yield return 0;
+        }
+
+        // 画面暗転中に実行する処理
+        fadingAction();
+
+        // 画面を明るくする
+        time = 0;
+        while (time <= interval)
         {
             alpha = Mathf.Lerp(1f, 0f, time / interval);
             time += Time.deltaTime;
             yield return 0;
         }
         fadeImage.enabled = false;
-        isFading = false;
-    }
-
-    public IEnumerator StartFadeOut()
-    {
-        isFading = true;
-        fadeImage.enabled = true;
-        time = 0;
-        while(time <= interval)
-        {
-            alpha = Mathf.Lerp(0f, 1f, time / interval);
-            time += Time.deltaTime;
-            yield return 0;
-        }
         isFading = false;
     }
 
