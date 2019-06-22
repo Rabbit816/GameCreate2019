@@ -38,6 +38,11 @@ public class CardControl : MonoBehaviour
     private List<int> cardNumList = new List<int>();
     private List<int> cardIdList = new List<int>();
 
+    // 獲得したカード情報
+    [SerializeField]
+    private GetCardView getCard;
+    public GetCardView GetCard { get { return getCard; } }
+
     private void Awake()
     {
         if(Instance == null)
@@ -140,12 +145,12 @@ public class CardControl : MonoBehaviour
 
         if(cardNumList.Distinct().Count() == 1)
         {
-            // 
+            // ペアだった場合
             StartCoroutine(DirectionToCard(1.0f, true));
         }
         else
         {
-            //
+            // ペアでなかった場合
             StartCoroutine(DirectionToCard(1.0f, false));
         }
     }
@@ -161,14 +166,17 @@ public class CardControl : MonoBehaviour
         yield return new WaitForSeconds(time);
         for(int i = 0; i < cardIdList.Count; i++)
         {
+            var card = allCardView[cardIdList[i]];
+
             if (flag)
             {
-                allCardView[cardIdList[i]].RemoveCard();    // カードを非表示にする
+                card.RemoveCard();    // カードを非表示にする
+                getCard.OutputGetCard(card.CardSpriteData);
                 GameMaster.Instance.GetCardCounter++;
             }
             else
             {
-                allCardView[cardIdList[i]].CardClose();    // カードを裏返す
+                card.CardClose();    // カードを裏返す
             }
         }
 
@@ -249,17 +257,5 @@ public class CardControl : MonoBehaviour
         }
 
         cardCheckFlag = false;
-    }
-
-    /// <summary>
-    /// デバッグ用の処理
-    /// </summary>
-    public void DebugMode()
-    {
-        foreach(Button button in allCardObjects)
-        {
-            var cardData = button.GetComponent<CardView>();
-            cardData.CardNumber = 1;
-        }
     }
 }

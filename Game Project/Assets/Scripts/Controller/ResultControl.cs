@@ -36,10 +36,6 @@ public class ResultControl : MonoBehaviour
             Instance = this;
         }
     }
-    private void Update()
-    {
-        timerText.text = minute.ToString("00") + " : " + second.ToString("00");
-    }
 
     /// <summary>
     /// リザルト情報の表示
@@ -58,17 +54,14 @@ public class ResultControl : MonoBehaviour
         if (isClear)
         {
             resultMainText.text = "GAME CLEAR !!";
-            turnText.text = gameEndTurn.ToString() + "ターン";
-            cardText.text = "すべてのカードを獲得";
         }
         else
         {
             resultMainText.text = "GAME OVER";
-            turnText.text = "クリアできませんでした";
-            cardText.text = getCardCount.ToString() + "まい";
         }
-        timerText.text = minute.ToString("00") + " : " + second.ToString("00");
-        
+        turnText.text = gameEndTurn.ToString() + "ターン";
+        timerText.text = minute.ToString() + "分 " + second.ToString("00") + "秒";
+        cardText.text = getCardCount.ToString() + "まい";
     }
 
     /// <summary>

@@ -43,6 +43,8 @@ public class GameMaster : MonoBehaviour
         result = ResultControl.Instance;
         card.SetCard();
         result.GameStart();
+        card.GetCard.ResetGetCard();
+        card.GetCard.HideGetCard();
     }
 
     private void Update()
@@ -88,6 +90,8 @@ public class GameMaster : MonoBehaviour
         turnCounter.CounterOn();
         result.GameStart();
         fadeStartFlag = true;
+        card.GetCard.ResetGetCard();
+        card.GetCard.HideGetCard();
     }
 
     /// <summary>
