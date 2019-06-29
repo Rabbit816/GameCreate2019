@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class CardView : CardData
 {
@@ -9,10 +10,17 @@ public class CardView : CardData
     private Image cardImage;
     private bool isCardTurning;
     public bool IsCardTurning { set { isCardTurning = value; } get { return isCardTurning; } }
+    [SerializeField]
+    private Vector3 cardSetPos;
+    public Vector3 CardSetPos { set { cardSetPos = value; } }
+
 
     private void Update()
     {
-        cardImage.sprite = CardSpriteData;
+        if(CardSpriteData != null && cardImage.sprite != CardSpriteData)
+        {
+            cardImage.sprite = CardSpriteData;
+        }
     }
 
     /// <summary>
@@ -87,6 +95,17 @@ public class CardView : CardData
         else
         {
             cardImage.color = new Color(cardImage.color.r, cardImage.color.g, cardImage.color.b, 0);
+        }
+    }
+
+    /// <summary>
+    /// カードを指定の位置に移動させる
+    /// </summary>
+    public void SetCardPosition()
+    {
+        if(transform.localPosition != cardSetPos)
+        {
+            transform.DOLocalMove(cardSetPos, 0.75f);
         }
     }
 

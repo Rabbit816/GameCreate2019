@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
+using DG.Tweening;
 
 public class CardControl : MonoBehaviour
 {
@@ -108,7 +109,7 @@ public class CardControl : MonoBehaviour
 
         // オブジェクトのTransformを設定
         int count = 0;
-        var startPos = new Vector3(-845, -300, 0);
+        var startPos = new Vector3(-845, 300, 0);
         for(int i = 0; i < 4; i++)
         {
             for(int j = 0; j < 13; j++)
@@ -116,10 +117,16 @@ public class CardControl : MonoBehaviour
                 allCardObjects[count].transform.SetParent(this.allCards.transform);
                 allCardObjects[count].transform.localScale = new Vector3(0.15f, 0.15f);
                 // X間隔140 Y間隔200
-                allCardObjects[count].transform.localPosition = new Vector3(startPos.x + 140 * j, startPos.y + 200 * i, 0);
+                allCardView[count].CardSetPos = new Vector3(startPos.x + 140 * j, startPos.y - 200 * i, 0);
+                allCardObjects[count].transform.localPosition = new Vector3(0, -800, 0);
                 count++;
             }
-        }        
+        }
+
+        foreach(CardView view in allCardView)
+        {
+            view.SetCardPosition();
+        }
     }
 
     /// <summary>
