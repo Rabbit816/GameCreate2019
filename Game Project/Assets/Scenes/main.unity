@@ -6163,7 +6163,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   turnCounter: {fileID: 1424377533}
-  limitTurn: 50
+  limitTurn: 70
 --- !u!4 &2000774116
 Transform:
   m_ObjectHideFlags: 0

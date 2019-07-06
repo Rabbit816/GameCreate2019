@@ -26,7 +26,8 @@ public class CardControl : MonoBehaviour
     // カードオブジェクト
     private Button[] allCardObjects = new Button[52];
     private CardView[] allCardView = new CardView[52];
-
+    private UnityEngine.Events.UnityAction[] buttonAction1 = new UnityEngine.Events.UnityAction[52], buttonAction2 = new UnityEngine.Events.UnityAction[52];
+    
     // 盤面のカードを格納しておくオブジェクト
     [SerializeField]
     private GameObject allCards;
@@ -43,6 +44,8 @@ public class CardControl : MonoBehaviour
     [SerializeField]
     private GetCardView getCard;
     public GetCardView GetCard { get { return getCard; } }
+
+    private int cardFirstMoveCount = 0;
 
     private void Awake()
     {
@@ -72,10 +75,16 @@ public class CardControl : MonoBehaviour
         for(int i = 0; i < allCardView.Length; i++)
         {
             // インスタンスの生成
-            allCardObjects[i] = Instantiate(cardObject);
+            if(allCardObjects[i] == null)
+            {
+                allCardObjects[i] = Instantiate(cardObject);
+            }
+            if(allCardView[i] == null)
+            {
+                allCardView[i] = allCardObjects[i].GetComponent<CardView>();
+            }
 
             // インスタンスに情報を割り当てる
-            allCardView[i] = allCardObjects[i].GetComponent<CardView>();
             var cardView = allCardView[i];
             if (0 <= cards[i] && cards[i] < 13)
             {
@@ -102,9 +111,23 @@ public class CardControl : MonoBehaviour
                 cardView.CardSpriteData = diaCards[cardView.CardNumber];
             }
             cardView.CardId = i;
-            // カードをクリックしたら実行する処理の追加
-            allCardObjects[i].onClick.AddListener(() => cardView.CardOpen());
-            allCardObjects[i].onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));
+        }
+        // カードをクリックしたら実行する処理の追加
+        for(int i = 0; i < buttonAction1.Length; i++)
+        {
+            if(buttonAction1[i] == null)
+            {
+                buttonAction1[i] = () => allCardView[i].CardOpen();
+                allCardObjects[i].onClick.AddListener(buttonAction1[i]);
+            }
+        }
+        for(int i = 0; i < buttonAction2.Length; i++)
+        {
+            if(buttonAction2[i] == null)
+            {
+                buttonAction2[i] = () => CheckCard(allCardView[i].CardNumber, allCardView[i].CardId);
+                allCardObjects[i].onClick.AddListener(buttonAction2[i]);
+            }
         }
 
         // オブジェクトのTransformを設定
@@ -123,10 +146,35 @@ public class CardControl : MonoBehaviour
             }
         }
 
-        foreach(CardView view in allCardView)
+        foreach(Button btn in allCardObjects)
+        {
+            btn.enabled = false;
+        }
+
+        StartCoroutine(CardMove());
+    }
+
+    private IEnumerator CardMove()
+    {
+        var card = new CardView[13];
+        int count = 0;
+        for(int i = 0; i < card.Length; i++)
+        {
+            card[i] = allCardView[i];
+            card[i].transform.DOLocalMove(new Vector3(-845, 300 * (1 - count), 0), 0.75f).OnComplete(() => { cardFirstMoveCount++; });
+        }
+
+        while(cardFirstMoveCount == 13)
+        {
+            yield return new WaitForEndOfFrame();
+        }
+
+        foreach(CardView view in card)
         {
             view.SetCardPosition();
         }
+
+        Debug.Log("MoveEnd");
     }
 
     /// <summary>
