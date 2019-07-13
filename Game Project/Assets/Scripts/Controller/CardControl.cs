@@ -26,7 +26,6 @@ public class CardControl : MonoBehaviour
     // カードオブジェクト
     private Button[] allCardObjects = new Button[52];
     private CardView[] allCardView = new CardView[52];
-    private UnityEngine.Events.UnityAction[] buttonAction1 = new UnityEngine.Events.UnityAction[52], buttonAction2 = new UnityEngine.Events.UnityAction[52];
     
     // 盤面のカードを格納しておくオブジェクト
     [SerializeField]
@@ -46,6 +45,10 @@ public class CardControl : MonoBehaviour
     public GetCardView GetCard { get { return getCard; } }
 
     private int cardFirstMoveCount = 0;
+    private int cardSecondMoveCount = 0;
+    public int CardSecondMoveCount { set { cardSecondMoveCount = value; } get { return cardSecondMoveCount; } }
+    private int cardMoveCounter = 0;
+
 
     private void Awake()
     {
@@ -58,7 +61,7 @@ public class CardControl : MonoBehaviour
     /// <summary>
     /// カードを画面上に並べる処理
     /// </summary>
-    public void SetCard()
+    public void SetCard(bool isFirstGame)
     {
         // シャッフル用の配列の準備
         for(int i = 0; i < cards.Length; i++) cards[i] = i;
@@ -85,7 +88,9 @@ public class CardControl : MonoBehaviour
             }
 
             // インスタンスに情報を割り当てる
+            var cardButton = allCardObjects[i];
             var cardView = allCardView[i];
+            
             if (0 <= cards[i] && cards[i] < 13)
             {
                 cardView.CardNumber = cards[i];
@@ -110,24 +115,30 @@ public class CardControl : MonoBehaviour
                 cardView.CardMark = "ダイヤ";
                 cardView.CardSpriteData = diaCards[cardView.CardNumber];
             }
-            cardView.CardId = i;
-        }
-        // カードをクリックしたら実行する処理の追加
-        for(int i = 0; i < buttonAction1.Length; i++)
-        {
-            if(buttonAction1[i] == null)
+            
+            // 初回ゲーム時のみ実行
+            if (isFirstGame)
             {
-                buttonAction1[i] = () => allCardView[i].CardOpen();
-                allCardObjects[i].onClick.AddListener(buttonAction1[i]);
+                cardView.CardId = i;
+                cardButton.onClick.AddListener(() => cardView.CardOpen());
+                cardButton.onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));
             }
         }
-        for(int i = 0; i < buttonAction2.Length; i++)
+
+        // 2回目以降のゲーム時のみ実行
+        if (!isFirstGame)
         {
-            if(buttonAction2[i] == null)
+            foreach (CardView view in allCardView)
             {
-                buttonAction2[i] = () => CheckCard(allCardView[i].CardNumber, allCardView[i].CardId);
-                allCardObjects[i].onClick.AddListener(buttonAction2[i]);
+                view.ResetCard();
             }
+
+            foreach(Button button in allCardObjects)
+            {
+                button.transform.SetParent(allCards.transform);
+            }
+
+            allCards.SetActive(true);
         }
 
         // オブジェクトのTransformを設定
@@ -141,7 +152,7 @@ public class CardControl : MonoBehaviour
                 allCardObjects[count].transform.localScale = new Vector3(0.15f, 0.15f);
                 // X間隔140 Y間隔200
                 allCardView[count].CardSetPos = new Vector3(startPos.x + 140 * j, startPos.y - 200 * i, 0);
-                allCardObjects[count].transform.localPosition = new Vector3(0, -800, 0);
+                allCardObjects[count].transform.localPosition = new Vector3(0, -1 * Screen.height, 0);
                 count++;
             }
         }
@@ -156,25 +167,48 @@ public class CardControl : MonoBehaviour
 
     private IEnumerator CardMove()
     {
-        var card = new CardView[13];
         int count = 0;
-        for(int i = 0; i < card.Length; i++)
+        cardMoveCounter = 0;
+
+        // カード並べる処理を4列分繰り返す
+        while (count < 4)
         {
-            card[i] = allCardView[i];
-            card[i].transform.DOLocalMove(new Vector3(-845, 300 * (1 - count), 0), 0.75f).OnComplete(() => { cardFirstMoveCount++; });
+            var card = new CardView[13];
+            cardFirstMoveCount = 0;
+            cardSecondMoveCount = 0;
+
+            for (int i = 0; i < card.Length; i++)
+            {
+                card[i] = allCardView[cardMoveCounter];
+                card[i].transform.DOLocalMove(new Vector3(-845, 300 - (200 * count), 0), 0.75f).OnComplete(() => { cardFirstMoveCount++; });
+                cardMoveCounter++;
+            }
+
+            while (cardFirstMoveCount < 13)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+
+            foreach (CardView view in card)
+            {
+                view.SetCardPosition();
+            }
+
+            while(cardSecondMoveCount < 13)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+            
+            count++;
         }
 
-        while(cardFirstMoveCount == 13)
+        // カードのクリックを許可
+        foreach (Button card in allCardObjects)
         {
-            yield return new WaitForEndOfFrame();
+            card.enabled = true;
         }
 
-        foreach(CardView view in card)
-        {
-            view.SetCardPosition();
-        }
-
-        Debug.Log("MoveEnd");
+        GameMaster.Instance.TimeFlag = true;
     }
 
     /// <summary>
@@ -221,17 +255,21 @@ public class CardControl : MonoBehaviour
         yield return new WaitForSeconds(time);
         for(int i = 0; i < cardIdList.Count; i++)
         {
-            var card = allCardView[cardIdList[i]];
+            var card = allCardObjects[cardIdList[i]];
+            var cardView = allCardView[cardIdList[i]];
 
             if (flag)
             {
-                card.RemoveCard();    // カードを非表示にする
-                getCard.OutputGetCard(card.CardSpriteData);
+                card.enabled = false;
+                card.transform.SetParent(GameMaster.Instance.GetCardBox.transform);
+                card.transform.DOLocalMove(new Vector3(0, 0, 0), 0.75f);
+                //card.RemoveCard();    // カードを非表示にする
+                getCard.OutputGetCard(cardView.CardSpriteData);
                 GameMaster.Instance.GetCardCounter++;
             }
             else
             {
-                card.CardClose();    // カードを裏返す
+                cardView.CardClose();    // カードを裏返す
             }
         }
 

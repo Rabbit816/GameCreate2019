@@ -13,6 +13,10 @@ public class GameMaster : MonoBehaviour
     [SerializeField]
     private TurnCounter turnCounter;
 
+    [SerializeField]
+    private GameObject getCardBox;
+    public GameObject GetCardBox { get { return getCardBox.transform.GetChild(0).gameObject; } }
+
     private int gameTurn;    // ターン数
     public int GameTurn { set { gameTurn = value; } get { return gameTurn; } }
     [SerializeField, Tooltip("ターン数の上限")]
@@ -23,6 +27,8 @@ public class GameMaster : MonoBehaviour
 
     private float gameTime;    // 経過時間
     public float GameTime { get { return gameTime; } }
+    private bool timeFlag = false;
+    public bool TimeFlag { set { timeFlag = value; } }
 
     private bool fadeStartFlag = true;
 
@@ -41,7 +47,7 @@ public class GameMaster : MonoBehaviour
         card = CardControl.Instance;
         fade = FadeControl.Instance;
         result = ResultControl.Instance;
-        card.SetCard();
+        card.SetCard(true);
         result.GameStart();
         card.GetCard.ResetGetCard();
         card.GetCard.HideGetCard();
@@ -65,7 +71,10 @@ public class GameMaster : MonoBehaviour
         }
         else
         {
-            gameTime += Time.deltaTime;
+            if (timeFlag)
+            {
+                gameTime += Time.deltaTime;
+            }
         }
     }
 
@@ -86,12 +95,14 @@ public class GameMaster : MonoBehaviour
         gameTurn = 0;
         getCardCounter = 0;
         gameTime = 0;
-        card.ResetCard();
+        timeFlag = false;
+        card.SetCard(false);
         turnCounter.CounterOn();
         result.GameStart();
         fadeStartFlag = true;
         card.GetCard.ResetGetCard();
         card.GetCard.HideGetCard();
+        getCardBox.SetActive(true);
     }
 
     /// <summary>
@@ -102,5 +113,6 @@ public class GameMaster : MonoBehaviour
         card.HideCards();
         turnCounter.CounterOff();
         result.GameEnd();
+        getCardBox.SetActive(false);
     }
 }

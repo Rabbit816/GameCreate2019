@@ -105,7 +105,11 @@ public class CardView : CardData
     {
         if(transform.localPosition != cardSetPos)
         {
-            transform.DOLocalMove(cardSetPos, 0.75f);
+            transform.DOLocalMove(cardSetPos, 0.75f).OnComplete(() => { CardControl.Instance.CardSecondMoveCount++; });
+        }
+        else
+        {
+            CardControl.Instance.CardSecondMoveCount++;
         }
     }
 
