@@ -155,9 +155,6 @@ public class CardControl : MonoBehaviour
             allCards.SetActive(true);
         }
 
-        // オブジェクトのTransformを設定
-        
-
         foreach(Button btn in allCardObjects)
         {
             btn.enabled = false;

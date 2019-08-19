@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class ResultControl : MonoBehaviour
 {
-    public static ResultControl Instance;
-
     [SerializeField]
     private GameObject thisGameObject;
 
@@ -28,14 +26,6 @@ public class ResultControl : MonoBehaviour
 
     // ゲーム終了時の獲得したカードの枚数の情報
     private int getCardCount;
-
-    private void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-    }
 
     /// <summary>
     /// リザルト情報の表示

@@ -6,24 +6,55 @@ using UnityEngine.UI;
 public class GameMaster : MonoBehaviour
 {
     public static GameMaster Instance;
+
     private CardControl card;
     private FadeControl fade;
     private ResultControl result;
-
-    [SerializeField]
     private TurnCounter turnCounter;
 
     [SerializeField]
+    private GameObject getCardBoxMainObj;
     private GameObject getCardBox;
-    public GameObject GetCardBox { get { return getCardBox.transform.GetChild(0).gameObject; } }
+    private Button getCardBoxButton;
+    public GameObject GetCardBox { get { return getCardBox; } }
 
-    private int gameTurn;    // ターン数
-    public int GameTurn { set { gameTurn = value; } get { return gameTurn; } }
-    [SerializeField, Tooltip("ターン数の上限")]
-    private int limitTurn;
+    private int gameTurn = 0;    // 経過ターン数
+    [SerializeField]
+    private int limitTurn = 0;    // 設定した制限ターン数
+    private int gamelimit = 0;    // ゲーム終了までのターン数
+    private bool limitGameMode = true;    // ゲームモードがターン制限ありどうか
+    public int GameTurn
+    {
+        set
+        {
+            gameTurn = value;
+            if (limitGameMode && limitTurn > 0)
+            {
+                gamelimit--;
+            }
+        }
+        get
+        {
+            return gameTurn;
+        }
+    }
 
     private int getCardCounter;    // 獲得したカードの枚数
     public int GetCardCounter { set { getCardCounter = value; } get { return getCardCounter; } }
+    private bool isGameClear    // ゲームをクリアしたかの判定
+    {
+        get
+        {
+            if(getCardCounter == 52)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    }
 
     private float gameTime;    // 経過時間
     public float GameTime { get { return gameTime; } }
@@ -38,37 +69,45 @@ public class GameMaster : MonoBehaviour
         {
             Instance = this;
         }
-        gameTurn = 0;
-        turnCounter.LimitTurn = limitTurn;
     }
 
     private void Start()
     {
+        // ゲーム初回起動時に取得する要素
         card = CardControl.Instance;
-        fade = FadeControl.Instance;
-        result = ResultControl.Instance;
+        fade = GetComponent<FadeControl>();
+        result = GetComponent<ResultControl>();
+        turnCounter = GetComponent<TurnCounter>();
+        getCardBox = getCardBoxMainObj.transform.GetChild(0).gameObject;
+        getCardBoxButton = getCardBoxMainObj.transform.GetChild(1).GetComponent<Button>();
+
+        // ゲーム初回起動時に実行する処理
         card.SetCard(true);
         result.GameStart();
         card.GetCard.ResetGetCard();
         card.GetCard.HideGetCard();
+        gamelimit = limitTurn;
     }
 
     private void Update()
     {
-        turnCounter.GameTurn = gameTurn;
-        if((getCardCounter == 52 || gameTurn == limitTurn) && fadeStartFlag)
+        // 残りターンをカウンターに反映
+        turnCounter.LimitTurn = gamelimit;
+
+        // 残りターン数が0になる又は、すべてのカードを獲得したらリザルトを出力
+        if((getCardCounter == 52 || gamelimit == 0) && fadeStartFlag)
         {
+            // 獲得カードリストは非表示にする
+            getCardBoxButton.enabled = false;
+            card.GetCard.ResetGetCard();
+            card.GetCard.HideGetCard();
+
+            // フェード処理と、リザルトの表示を実行
             fade.StartFade(GameOverAction);
             fadeStartFlag = false;
-            if(getCardCounter == 52)
-            {
-                result.OutputResult(true);
-            }
-            else
-            {
-                result.OutputResult(false);
-            }
+            result.OutputResult(isGameClear);
         }
+        // 残りターンが1ターン以上で、すべてのカードを獲得していないなら時間を計測
         else
         {
             if (timeFlag)
@@ -93,6 +132,7 @@ public class GameMaster : MonoBehaviour
     public void ResetGame()
     {
         gameTurn = 0;
+        gamelimit = limitTurn;
         getCardCounter = 0;
         gameTime = 0;
         timeFlag = false;
@@ -100,8 +140,7 @@ public class GameMaster : MonoBehaviour
         turnCounter.CounterOn();
         result.GameStart();
         fadeStartFlag = true;
-        card.GetCard.ResetGetCard();
-        card.GetCard.HideGetCard();
+        getCardBoxButton.enabled = true;
         getCardBox.SetActive(true);
     }
 

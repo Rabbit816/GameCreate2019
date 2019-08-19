@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class FadeControl : MonoBehaviour
 {
-    public static FadeControl Instance;
-
     [SerializeField]
     private float interval;    // 透明度が変わるスピードを管理
     private float time;
@@ -18,21 +16,13 @@ public class FadeControl : MonoBehaviour
     private bool isFading = false;
     public bool IsFading { get { return isFading; } set { isFading = false; } }
 
-    private void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-    }
-
     void Start()
     {
         red = fadeImage.color.r;
         green = fadeImage.color.g;
         blue = fadeImage.color.b;
         alpha = fadeImage.color.a;
-        transform.SetAsLastSibling();
+        fadeImage.transform.SetAsLastSibling();
     }
 
     void Update()
