@@ -115,47 +115,48 @@ public class CardControl : MonoBehaviour
                 cardView.CardMark = "ダイヤ";
                 cardView.CardSpriteData = diaCards[cardView.CardNumber];
             }
-            
-            // 初回ゲーム時のみ実行
-            if (isFirstGame)
-            {
-                cardView.CardId = i;
-                cardButton.onClick.AddListener(() => cardView.CardOpen());
-                cardButton.onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));
-            }
         }
 
-        // 2回目以降のゲーム時のみ実行
-        if (!isFirstGame)
+        // カードを1つのオブジェクトに格納
+        foreach (Button button in allCardObjects)
+        {
+            button.transform.SetParent(allCards.transform);
+            button.transform.localPosition = new Vector3(0, -1 * Screen.height, 0);
+        }
+
+        // 初回ゲーム時のみ実行
+        if (isFirstGame)
+        {
+            int count = 0;
+            var startPos = new Vector3(-845, 300, 0);
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 13; j++)
+                {
+                    var cardButton = allCardObjects[count];
+                    var cardView = allCardView[count];
+                    cardButton.transform.localScale = new Vector3(0.15f, 0.15f);
+                    cardView.CardSetPos = new Vector3(startPos.x + 140 * j, startPos.y - 200 * i, 0);
+
+                    cardView.CardId = count;    // カードの固有ID
+                    cardButton.onClick.AddListener(() => cardView.CardOpen());    // カードをめくる処理の追加
+                    cardButton.onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));    // ペア判定処理の追加
+
+                    count++;
+                }
+            }
+        }
+        else
         {
             foreach (CardView view in allCardView)
             {
                 view.ResetCard();
             }
-
-            foreach(Button button in allCardObjects)
-            {
-                button.transform.SetParent(allCards.transform);
-            }
-
             allCards.SetActive(true);
         }
 
         // オブジェクトのTransformを設定
-        int count = 0;
-        var startPos = new Vector3(-845, 300, 0);
-        for(int i = 0; i < 4; i++)
-        {
-            for(int j = 0; j < 13; j++)
-            {
-                allCardObjects[count].transform.SetParent(this.allCards.transform);
-                allCardObjects[count].transform.localScale = new Vector3(0.15f, 0.15f);
-                // X間隔140 Y間隔200
-                allCardView[count].CardSetPos = new Vector3(startPos.x + 140 * j, startPos.y - 200 * i, 0);
-                allCardObjects[count].transform.localPosition = new Vector3(0, -1 * Screen.height, 0);
-                count++;
-            }
-        }
+        
 
         foreach(Button btn in allCardObjects)
         {
@@ -295,60 +296,5 @@ public class CardControl : MonoBehaviour
     public void HideCards()
     {
         allCards.SetActive(false);
-    }
-
-    /// <summary>
-    /// カードを再配置する処理
-    /// </summary>
-    public void ResetCard()
-    {
-        for (int i = 0; i < cards.Length; i++)
-        {
-            int tmp = cards[i];
-            int index = Random.Range(0, cards.Length);
-            cards[i] = cards[index];
-            cards[index] = tmp;
-        }
-        for (int i = 0; i < allCardView.Length; i++)
-        {
-            var cardView = allCardView[i];
-            if (0 <= cards[i] && cards[i] < 13)
-            {
-                cardView.CardNumber = cards[i];
-                cardView.CardMark = "スペード";
-                cardView.CardSpriteData = spadeCards[cardView.CardNumber];
-            }
-            else if (13 <= cards[i] && cards[i] < 26)
-            {
-                cardView.CardNumber = cards[i] - 13;
-                cardView.CardMark = "クローバー";
-                cardView.CardSpriteData = cloverCards[cardView.CardNumber];
-            }
-            else if (26 <= cards[i] && cards[i] < 39)
-            {
-                cardView.CardNumber = cards[i] - 26;
-                cardView.CardMark = "ハート";
-                cardView.CardSpriteData = heartCards[cardView.CardNumber];
-            }
-            else
-            {
-                cardView.CardNumber = cards[i] - 39;
-                cardView.CardMark = "ダイヤ";
-                cardView.CardSpriteData = diaCards[cardView.CardNumber];
-            }
-        }
-
-        allCards.SetActive(true);
-
-        foreach(Button button in allCardObjects)
-        {
-            button.enabled = true;
-        }
-        foreach(CardView view in allCardView)
-        {
-            view.ResetCard();
-        }
-
-        cardCheckFlag = false;
     }
 }
