@@ -10,33 +10,31 @@ public class TurnCounter : MonoBehaviour
 
     [SerializeField]
     private Text text;
-    [SerializeField]
-    private GameObject turnCounterObj;
 
     // Update is called once per frame
     void Update()
     {
         if(limitTurn > 10)
         {
-            text.text = "<size=75><color=black>" + limitTurn.ToString() + "</color></size>";
+            text.text = "ゲーム終了まであと <size=75>" + limitTurn.ToString() + "</size> ターンです";
         }
         else if(limitTurn > 3)
         {
-            text.text = "<size=75><color=yellow>" + limitTurn.ToString() + "</color></size>";
+            text.text = "ゲーム終了まであと <size=75><color=yellow>" + limitTurn.ToString() + "</color></size> ターンです";
         }
         else
         {
-            text.text = "<size=100><color=red>" + limitTurn.ToString() + "</color></size>";
+            text.text = "ゲーム終了まであと <size=100><color=red>" + limitTurn.ToString() + "</color></size> ターンです";
         }
     }
 
     public void CounterOn()
     {
-        turnCounterObj.SetActive(true);
+        text.gameObject.SetActive(true);
     }
 
     public void CounterOff()
     {
-        turnCounterObj.SetActive(false);
+        text.gameObject.SetActive(false);
     }
 }

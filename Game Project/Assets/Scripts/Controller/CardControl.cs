@@ -261,8 +261,11 @@ public class CardControl : MonoBehaviour
                 card.enabled = false;
                 card.transform.SetParent(GameMaster.Instance.GetCardBox.transform);
                 card.transform.DOLocalMove(new Vector3(0, 0, 0), 0.75f);
-                //card.RemoveCard();    // カードを非表示にする
                 getCard.OutputGetCard(cardView.CardSpriteData);
+                if (!GameMaster.Instance.GetCardButtonEnabled)
+                {
+                    GameMaster.Instance.GetCardButtonEnabled = true;
+                }
                 GameMaster.Instance.GetCardCounter++;
             }
             else

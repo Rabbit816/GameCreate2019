@@ -122,14 +122,4 @@ public class CardView : CardData
         NumberSprite(false);
         gameObject.SetActive(true);
     }
-
-    /// <summary>
-    /// カードを非表示にする処理
-    /// </summary>
-    public void RemoveCard()
-    {
-        isCardTurning = true;
-        gameObject.SetActive(false);
-        isCardTurning = false;
-    }
 }
