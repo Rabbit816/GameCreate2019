@@ -18,6 +18,11 @@ public class TitleControl : MonoBehaviour
     private bool updateFlagL = true, updateFlagR = true;    // updateの動作を管理するフラグ
     private bool moveEndL = false, moveEndR = false;    // オブジェクトの移動の完了を検知するフラグ
 
+    [SerializeField, Tooltip("タイトル文字のオブジェクト")]
+    private GameObject titleTextObj;
+    [SerializeField, Tooltip("ゲーム終了ボタン")]
+    private GameObject exitButtonObj;
+
     private void Awake()
     {
         objStartPosL = cardObjL.transform.localPosition;
@@ -76,6 +81,8 @@ public class TitleControl : MonoBehaviour
         // オブジェクトの移動完了を検知したら実行
         if(moveEndL && moveEndR)
         {
+            moveEndL = false;
+            moveEndR = false;
             AllObjMoveEnd();
         }
     }
@@ -101,7 +108,12 @@ public class TitleControl : MonoBehaviour
         foreach(Button button in settingButtons)
         {
             button.gameObject.SetActive(false);
+            button.enabled = false;
         }
+
+        // タイトルのオブジェクトを非表示
+        titleTextObj.SetActive(false);
+        exitButtonObj.SetActive(false);
     }
 
     /// <summary>
@@ -121,11 +133,31 @@ public class TitleControl : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 全てのカードオブジェクトに移動が完了したら実行
+    /// </summary>
     private void AllObjMoveEnd()
     {
         foreach(Button button in settingButtons)
         {
             button.enabled = true;
         }
+    }
+
+    /// <summary>
+    /// タイトルオブジェクトの配置をリセットする
+    /// </summary>
+    public void ReturnTitle()
+    {
+        cardObjL.SetActive(true);
+        cardObjR.SetActive(true);
+        titleTextObj.SetActive(true);
+        exitButtonObj.SetActive(true);
+        foreach(Button button in settingButtons)
+        {
+            button.gameObject.SetActive(true);
+        }
+        updateFlagL = true;
+        updateFlagR = true;
     }
 }

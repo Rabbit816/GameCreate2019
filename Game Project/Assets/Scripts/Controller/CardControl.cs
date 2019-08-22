@@ -151,8 +151,8 @@ public class CardControl : MonoBehaviour
             foreach (CardView view in allCardView)
             {
                 view.ResetCard();
+                view.gameObject.SetActive(true);
             }
-            allCards.SetActive(true);
         }
 
         foreach(Button btn in allCardObjects)
@@ -295,6 +295,9 @@ public class CardControl : MonoBehaviour
     /// </summary>
     public void HideCards()
     {
-        allCards.SetActive(false);
+        foreach(Button button in allCardObjects)
+        {
+            button.gameObject.SetActive(false);
+        }
     }
 }

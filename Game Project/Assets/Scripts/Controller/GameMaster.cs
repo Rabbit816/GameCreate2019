@@ -151,7 +151,7 @@ public class GameMaster : MonoBehaviour
         switch (gameMode)
         {
             case GameMode.limit50:
-                limitTurn = 50;
+                limitTurn = 3;
                 break;
             case GameMode.limit75:
                 limitTurn = 75;
@@ -199,7 +199,18 @@ public class GameMaster : MonoBehaviour
         }
         result.GameStart();
         fadeStartFlag = true;
-        getCardBox.SetActive(true);
+    }
+
+    /// <summary>
+    /// タイトルに戻る処理
+    /// </summary>
+    public void ReturnTitle()
+    {
+        gameTurn = 0;
+        getCardCounter = 0;
+        gameTime = 0;
+        result.GameStart();
+        title.ReturnTitle();
     }
 
     /// <summary>
@@ -210,6 +221,5 @@ public class GameMaster : MonoBehaviour
         card.HideCards();
         turnCounter.CounterOff();
         result.GameEnd();
-        getCardBox.SetActive(false);
     }
 }
