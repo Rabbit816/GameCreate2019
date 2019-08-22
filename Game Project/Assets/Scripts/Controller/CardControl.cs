@@ -63,6 +63,13 @@ public class CardControl : MonoBehaviour
     /// </summary>
     public void SetCard(bool isFirstGame)
     {
+        if (cardCheckFlag)
+        {
+            cardCheckFlag = false;
+            cardNumList = new List<int>();
+            cardIdList = new List<int>();
+        }
+
         // シャッフル用の配列の準備
         for(int i = 0; i < cards.Length; i++) cards[i] = i;
 
@@ -155,10 +162,7 @@ public class CardControl : MonoBehaviour
             }
         }
 
-        foreach(Button btn in allCardObjects)
-        {
-            btn.enabled = false;
-        }
+        CardClick(false);
 
         StartCoroutine(CardMove());
     }
@@ -201,12 +205,10 @@ public class CardControl : MonoBehaviour
         }
 
         // カードのクリックを許可
-        foreach (Button card in allCardObjects)
-        {
-            card.enabled = true;
-        }
+        CardClick(true);
 
         GameMaster.Instance.TimeFlag = true;
+        GameMaster.Instance.MenuButtonActive(true);
     }
 
     /// <summary>
@@ -225,12 +227,13 @@ public class CardControl : MonoBehaviour
             return;
         }
 
-        foreach(Button button in allCardObjects)
-        {
-            button.enabled = false;    // カードのクリックを無効にする
-        }
+        // カードのクリックを無効にする
+        CardClick(false);
 
-        if(cardNumList.Distinct().Count() == 1)
+        // メニューボタンを一時的に非表示にする
+        GameMaster.Instance.MenuButtonActive(false);
+
+        if (cardNumList.Distinct().Count() == 1)
         {
             // ペアだった場合
             StartCoroutine(DirectionToCard(1.0f, true));
@@ -279,15 +282,14 @@ public class CardControl : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        foreach(Button button in allCardObjects)
-        {
-            button.enabled = true;    // カードのクリックを有効にする
-        }
+        // カードのクリックを有効にする
+        CardClick(true);
 
         cardIdList.Clear();
         cardNumList.Clear();
         cardCheckFlag = false;
         GameMaster.Instance.GameTurn++;
+        GameMaster.Instance.MenuButtonActive(true);
     }
 
     /// <summary>
@@ -298,6 +300,18 @@ public class CardControl : MonoBehaviour
         foreach(Button button in allCardObjects)
         {
             button.gameObject.SetActive(false);
+        }
+    }
+
+    /// <summary>
+    /// カードのクリックのオンオフ
+    /// </summary>
+    /// <param name="b">true=ON, false=OFF</param>
+    public void CardClick(bool b)
+    {
+        foreach(Button button in allCardObjects)
+        {
+            button.enabled = b;
         }
     }
 }

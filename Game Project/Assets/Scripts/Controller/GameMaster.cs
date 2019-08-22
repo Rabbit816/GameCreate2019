@@ -65,6 +65,11 @@ public class GameMaster : MonoBehaviour
     private bool fadeStartFlag = false;    // フェードを管理するフラグ
     private bool firstGameFlag = true;    //　ゲームが初回かどうかをチェックするフラグ
 
+    [SerializeField, Tooltip("メニューボタン")]
+    private Button menuButton;
+    [SerializeField, Tooltip("メニューボタンで表示されるオブジェクト")]
+    private GameObject menuObject;
+
     private void Awake()
     {
         if(Instance == null)
@@ -91,6 +96,8 @@ public class GameMaster : MonoBehaviour
         turnCounter.CounterOff();
         getCardBoxButton.enabled = false;
         title.ButtonActionSet();
+        MenuButtonActive(false);
+        menuObject.SetActive(false);
     }
 
     private void Update()
@@ -108,6 +115,10 @@ public class GameMaster : MonoBehaviour
             getCardBoxButton.enabled = false;
             card.GetCard.ResetGetCard();
             card.GetCard.HideGetCard();
+
+            // メニューを非表示及び無効
+            MenuButtonActive(false);
+            menuObject.SetActive(false);
 
             // フェード処理と、リザルトの表示を実行
             fade.StartFade(GameOverAction);
@@ -151,7 +162,7 @@ public class GameMaster : MonoBehaviour
         switch (gameMode)
         {
             case GameMode.limit50:
-                limitTurn = 3;
+                limitTurn = 50;
                 break;
             case GameMode.limit75:
                 limitTurn = 75;
@@ -202,7 +213,7 @@ public class GameMaster : MonoBehaviour
     }
 
     /// <summary>
-    /// タイトルに戻る処理
+    /// タイトルに戻るボタンの処理
     /// </summary>
     public void ReturnTitle()
     {
@@ -221,5 +232,91 @@ public class GameMaster : MonoBehaviour
         card.HideCards();
         turnCounter.CounterOff();
         result.GameEnd();
+    }
+
+    /// <summary>
+    /// メニューボタンを押したら呼び出される処理
+    /// </summary>
+    public void OpenMenuButton()
+    {
+        // タイマーを一時的に停止
+        timeFlag = false;
+
+        // カードのクリックを一時的に無効
+        CardControl.Instance.CardClick(false);
+
+        //　メニューの表示
+        menuObject.SetActive(true);
+
+        //　メニューボタンのクリックを無効
+        menuButton.enabled = false;
+
+        // 獲得したカードリストを非表示
+        getCardBoxButton.enabled = false;
+        card.GetCard.HideGetCard();
+    }
+
+    /// <summary>
+    /// メニューのリスタートボタンの処理
+    /// </summary>
+    public void RestartMenuButton()
+    {
+        card.GetCard.ResetGetCard();
+        ResetGame();
+        MenuButtonActive(false);
+        menuObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// メニューのタイトルに戻るボタンの処理
+    /// </summary>
+    public void TitleMenuButton()
+    {
+        gameTurn = 0;
+        getCardCounter = 0;
+        gameTime = 0;
+        title.ReturnTitle();
+        card.HideCards();
+        turnCounter.CounterOff();
+        card.GetCard.ResetGetCard();
+        MenuButtonActive(false);
+        menuObject.SetActive(false);
+    }
+
+    /// <summary>
+    /// メニューを閉じるボタンの処理
+    /// </summary>
+    public void CloseMenuButton()
+    {
+        // メニューを非表示
+        menuObject.SetActive(false);
+
+        // カードのクリックを有効
+        CardControl.Instance.CardClick(true);
+
+        // タイマーの計測を再開
+        timeFlag = true;
+
+        // メニューボタンのクリックを有効
+        menuButton.enabled = true;
+
+        // 獲得したカードリストのボタンを有効
+        if(getCardCounter > 0)
+        {
+            getCardBoxButton.enabled = true;
+        }
+    }
+
+    /// <summary>
+    /// メニューボタンのオンオフ
+    /// </summary>
+    /// <param name="b">true=表示, false=非表示</param>
+    public void MenuButtonActive(bool b)
+    {
+        menuButton.gameObject.SetActive(b);
+        if (!menuButton.enabled)
+        {
+            menuButton.enabled = true;
+        }
     }
 }
