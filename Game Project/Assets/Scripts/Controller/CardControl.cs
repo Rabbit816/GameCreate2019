@@ -274,12 +274,18 @@ public class CardControl : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        // カードのクリックを有効にする
-        CardClick(true);
-
         cardIdList.Clear();
         cardNumList.Clear();
         cardCheckFlag = false;
+
+        // 全てのカードを取得したならこの処理を終了する
+        if(GameMaster.Instance.GetCardCounter == 52)
+        {
+            yield break;
+        }
+
+        // カードのクリックを有効にする
+        CardClick(true);
         GameMaster.Instance.GameTurn++;
         GameMaster.Instance.MenuButtonActive(true);
     }

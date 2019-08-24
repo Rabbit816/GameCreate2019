@@ -117,10 +117,6 @@ public class GameMaster : MonoBehaviour
             card.GetCard.ResetGetCard();
             card.GetCard.GetCardListActive(false);
 
-            // メニューを非表示及び無効
-            MenuButtonActive(false);
-            menuObject.SetActive(false);
-
             // フェード処理と、リザルトの表示を実行
             fade.StartFade(GameOverAction);
             fadeStartFlag = false;
