@@ -27,7 +27,6 @@ public class TitleControl : MonoBehaviour
     private GameObject moveButtonObjL, moveButtonObjR;
     [SerializeField, Tooltip("ガイドテキスト")]
     private Text startText, ruleText, hintText;
-    [SerializeField]
     private EventTrigger[] eventTriggers;    // ルール設定ボタン用のイベントトリガー
 
     private void Awake()

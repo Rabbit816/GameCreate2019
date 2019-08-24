@@ -34,13 +34,12 @@ public class GetCardView : MonoBehaviour
         cardCounter++;
     }
 
-    public void HideGetCard()
+    /// <summary>
+    /// 獲得したカードリストのオンオフ
+    /// </summary>
+    /// <param name="b">true=表示, false=非表示</param>
+    public void GetCardListActive(bool b)
     {
-        gameObject.SetActive(false);
-    }
-
-    public void OpenGetCard()
-    {
-        gameObject.SetActive(true);
+        gameObject.SetActive(b);
     }
 }

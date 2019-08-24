@@ -7,8 +7,6 @@ using DG.Tweening;
 
 public class CardControl : MonoBehaviour
 {
-    public static CardControl Instance;
-
     // カードのImageデータ
     [SerializeField]
     private List<Sprite> spadeCards;
@@ -48,15 +46,6 @@ public class CardControl : MonoBehaviour
     private int cardSecondMoveCount = 0;
     public int CardSecondMoveCount { set { cardSecondMoveCount = value; } get { return cardSecondMoveCount; } }
     private int cardMoveCounter = 0;
-
-
-    private void Awake()
-    {
-        if(Instance == null)
-        {
-            Instance = this;
-        }
-    }
 
     /// <summary>
     /// カードを画面上に並べる処理
@@ -146,7 +135,7 @@ public class CardControl : MonoBehaviour
                     cardView.CardSetPos = new Vector3(startPos.x + 140 * j, startPos.y - 200 * i, 0);
 
                     cardView.CardId = count;    // カードの固有ID
-                    cardButton.onClick.AddListener(() => cardView.CardOpen());    // カードをめくる処理の追加
+                    cardButton.onClick.AddListener(() => cardView.TurnCard(true));    // カードをめくる処理の追加
                     cardButton.onClick.AddListener(() => CheckCard(cardView.CardNumber, cardView.CardId));    // ペア判定処理の追加
 
                     count++;
@@ -158,8 +147,8 @@ public class CardControl : MonoBehaviour
             foreach (CardView view in allCardView)
             {
                 view.ResetCard();
-                view.gameObject.SetActive(true);
             }
+            AllCardsActive(true);
         }
 
         CardClick(false);
@@ -254,6 +243,9 @@ public class CardControl : MonoBehaviour
     IEnumerator DirectionToCard(float time, bool flag)
     {
         yield return new WaitForSeconds(time);
+
+        int moveEndCounter = 0;
+
         for(int i = 0; i < cardIdList.Count; i++)
         {
             var card = allCardObjects[cardIdList[i]];
@@ -261,9 +253,8 @@ public class CardControl : MonoBehaviour
 
             if (flag)
             {
-                card.enabled = false;
                 card.transform.SetParent(GameMaster.Instance.GetCardBox.transform);
-                card.transform.DOLocalMove(new Vector3(0, 0, 0), 0.75f);
+                card.transform.DOLocalMove(new Vector3(0, 0, 0), 0.75f).OnComplete(() => { moveEndCounter++; });
                 getCard.OutputGetCard(cardView.CardSpriteData);
                 if (!GameMaster.Instance.GetCardButtonEnabled)
                 {
@@ -273,11 +264,12 @@ public class CardControl : MonoBehaviour
             }
             else
             {
-                cardView.CardClose();    // カードを裏返す
+                cardView.TurnCard(false);    // カードを裏返す
+                moveEndCounter++;
             }
         }
 
-        while(allCardView[cardIdList[cardIdList.Count - cardIdList.Count]].IsCardTurning && allCardView[cardIdList.Count - 1].IsCardTurning)
+        while((allCardView[cardIdList[0]].IsCardTurning && allCardView[cardIdList[1]].IsCardTurning) || moveEndCounter != cardIdList.Count)
         {
             yield return new WaitForEndOfFrame();
         }
@@ -293,13 +285,14 @@ public class CardControl : MonoBehaviour
     }
 
     /// <summary>
-    /// 盤面のカードを全て非表示にする
+    /// 盤面のカードの表示、非表示を管理する
     /// </summary>
-    public void HideCards()
+    /// <param name="b">true=表示, false=非表示</param>
+    public void AllCardsActive(bool b)
     {
         foreach(Button button in allCardObjects)
         {
-            button.gameObject.SetActive(false);
+            button.gameObject.SetActive(b);
         }
     }
 

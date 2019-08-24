@@ -24,19 +24,12 @@ public class CardView : CardData
     }
 
     /// <summary>
-    /// カードを表示する処理
+    /// カードを返す処理
     /// </summary>
-    public void CardOpen()
+    /// <param name="b">true=数字の面を表示, false=裏に戻す</param>
+    public void TurnCard(bool b)
     {
-        StartCoroutine(CardAction(true));
-    }
-
-    /// <summary>
-    /// カードを裏返す処理
-    /// </summary>
-    public void CardClose()
-    {
-        StartCoroutine(CardAction(false));
+        StartCoroutine(CardAction(b));
     }
 
     private IEnumerator CardAction(bool turnMode)
@@ -105,11 +98,11 @@ public class CardView : CardData
     {
         if(transform.localPosition != cardSetPos)
         {
-            transform.DOLocalMove(cardSetPos, 0.75f).OnComplete(() => { CardControl.Instance.CardSecondMoveCount++; });
+            transform.DOLocalMove(cardSetPos, 0.75f).OnComplete(() => { GameMaster.Instance.Card.CardSecondMoveCount++; });
         }
         else
         {
-            CardControl.Instance.CardSecondMoveCount++;
+            GameMaster.Instance.Card.CardSecondMoveCount++;
         }
     }
 

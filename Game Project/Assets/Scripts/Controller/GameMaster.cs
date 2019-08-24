@@ -8,12 +8,13 @@ public class GameMaster : MonoBehaviour
     public static GameMaster Instance;
 
     private CardControl card;
+    public CardControl Card { get { return card; } }
     private FadeControl fade;
     private ResultControl result;
     private TurnCounter turnCounter;
     private TitleControl title;
 
-    [SerializeField]
+    [SerializeField, Tooltip("獲得したカードを格納するオブジェクト")]
     private GameObject getCardBoxMainObj;
     private GameObject getCardBox;
     private Button getCardBoxButton;
@@ -76,24 +77,24 @@ public class GameMaster : MonoBehaviour
         {
             Instance = this;
         }
-    }
 
-    private void Start()
-    {
         // ゲーム初回起動時に取得する要素
-        card = CardControl.Instance;
+        card = GetComponent<CardControl>();
         fade = GetComponent<FadeControl>();
         result = GetComponent<ResultControl>();
         turnCounter = GetComponent<TurnCounter>();
         getCardBox = getCardBoxMainObj.transform.GetChild(0).gameObject;
         getCardBoxButton = getCardBoxMainObj.transform.GetChild(1).GetComponent<Button>();
         title = GetComponent<TitleControl>();
+    }
 
+    private void Start()
+    {
         // ゲーム初回起動時に実行する処理
         result.GameStart();
         card.GetCard.ResetGetCard();
-        card.GetCard.HideGetCard();
-        turnCounter.CounterOff();
+        card.GetCard.GetCardListActive(false);
+        turnCounter.CounterActive(false);
         getCardBoxButton.enabled = false;
         title.ButtonActionSet();
         MenuButtonActive(false);
@@ -114,7 +115,7 @@ public class GameMaster : MonoBehaviour
             // 獲得カードリストは非表示にする
             getCardBoxButton.enabled = false;
             card.GetCard.ResetGetCard();
-            card.GetCard.HideGetCard();
+            card.GetCard.GetCardListActive(false);
 
             // メニューを非表示及び無効
             MenuButtonActive(false);
@@ -135,11 +136,11 @@ public class GameMaster : MonoBehaviour
 
     public void Quit()
     {
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#elif UNITY_STANDALONE
-    UnityEngine.Application.Quit();
-#endif
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #elif UNITY_STANDALONE
+            UnityEngine.Application.Quit();
+        #endif
     }
 
     /// <summary>
@@ -177,12 +178,12 @@ public class GameMaster : MonoBehaviour
         if (gameMode == GameMode.limitInf)
         {
             limitGameMode = false;
-            turnCounter.CounterOff();
+            turnCounter.CounterActive(false);
         }
         else
         {
             limitGameMode = true;
-            turnCounter.CounterOn();
+            turnCounter.CounterActive(true);
         }
 
         // カードを並べる処理の開始
@@ -206,7 +207,7 @@ public class GameMaster : MonoBehaviour
         card.SetCard(false);
         if (limitGameMode)
         {
-            turnCounter.CounterOn();
+            turnCounter.CounterActive(true);
         }
         result.GameStart();
         fadeStartFlag = true;
@@ -229,8 +230,8 @@ public class GameMaster : MonoBehaviour
     /// </summary>
     private void GameOverAction()
     {
-        card.HideCards();
-        turnCounter.CounterOff();
+        card.AllCardsActive(false);
+        turnCounter.CounterActive(false);
         result.GameEnd();
     }
 
@@ -243,7 +244,7 @@ public class GameMaster : MonoBehaviour
         timeFlag = false;
 
         // カードのクリックを一時的に無効
-        CardControl.Instance.CardClick(false);
+        card.CardClick(false);
 
         //　メニューの表示
         menuObject.SetActive(true);
@@ -253,7 +254,7 @@ public class GameMaster : MonoBehaviour
 
         // 獲得したカードリストを非表示
         getCardBoxButton.enabled = false;
-        card.GetCard.HideGetCard();
+        card.GetCard.GetCardListActive(false);
     }
 
     /// <summary>
@@ -276,8 +277,8 @@ public class GameMaster : MonoBehaviour
         getCardCounter = 0;
         gameTime = 0;
         title.ReturnTitle();
-        card.HideCards();
-        turnCounter.CounterOff();
+        card.AllCardsActive(false);
+        turnCounter.CounterActive(false);
         card.GetCard.ResetGetCard();
         MenuButtonActive(false);
         menuObject.SetActive(false);
@@ -292,7 +293,7 @@ public class GameMaster : MonoBehaviour
         menuObject.SetActive(false);
 
         // カードのクリックを有効
-        CardControl.Instance.CardClick(true);
+        card.CardClick(true);
 
         // タイマーの計測を再開
         timeFlag = true;

@@ -8,7 +8,7 @@ public class TurnCounter : MonoBehaviour
     private int limitTurn;    // ゲーム終了までのターン数
     public int LimitTurn { set { limitTurn = value; } }
 
-    [SerializeField]
+    [SerializeField, Tooltip("ゲーム終了までのターン数を表示するTextオブジェクト")]
     private Text text;
 
     // Update is called once per frame
@@ -28,13 +28,12 @@ public class TurnCounter : MonoBehaviour
         }
     }
 
-    public void CounterOn()
+    /// <summary>
+    /// カウンターの表示、非表示の管理
+    /// </summary>
+    /// <param name="b">true=表示, false=非表示</param>
+    public void CounterActive(bool b)
     {
-        text.gameObject.SetActive(true);
-    }
-
-    public void CounterOff()
-    {
-        text.gameObject.SetActive(false);
+        text.gameObject.SetActive(b);
     }
 }
