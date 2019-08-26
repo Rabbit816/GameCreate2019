@@ -278,15 +278,17 @@ public class CardControl : MonoBehaviour
         cardNumList.Clear();
         cardCheckFlag = false;
 
+        // ゲームのターン数を加算
+        GameMaster.Instance.GameTurn++;
+
         // 全てのカードを取得したならこの処理を終了する
-        if(GameMaster.Instance.GetCardCounter == 52)
+        if (GameMaster.Instance.GetCardCounter >= 52 || GameMaster.Instance.GameLimit <= 0)
         {
             yield break;
         }
 
         // カードのクリックを有効にする
         CardClick(true);
-        GameMaster.Instance.GameTurn++;
         GameMaster.Instance.MenuButtonActive(true);
     }
 

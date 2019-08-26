@@ -24,13 +24,14 @@ public class GameMaster : MonoBehaviour
     private int gameTurn = 0;    // 経過ターン数
     private int limitTurn = 0;    // 設定した制限ターン数
     private int gamelimit = 0;    // ゲーム終了までのターン数
+    public int GameLimit { get { return gamelimit; } }
     private bool limitGameMode = true;    // ゲームモードがターン制限ありどうか
     public int GameTurn
     {
         set
         {
             gameTurn = value;
-            if (limitGameMode && limitTurn > 0)
+            if (limitGameMode && gamelimit > 0)
             {
                 gamelimit--;
             }
