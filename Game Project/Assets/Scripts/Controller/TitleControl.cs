@@ -193,6 +193,9 @@ public class TitleControl : MonoBehaviour
     /// </summary>
     public void CardObjMoveL()
     {
+        // SE再生
+        GameMaster.Instance.PlaySE();
+
         updateFlagL = false;
         moveButtonObjL.SetActive(false);
         moveEndL = true;
@@ -209,6 +212,9 @@ public class TitleControl : MonoBehaviour
     /// </summary>
     public void CardObjMoveR()
     {
+        // SE再生
+        GameMaster.Instance.PlaySE();
+
         updateFlagR = false;
         moveButtonObjR.SetActive(false);
         moveEndR = true;

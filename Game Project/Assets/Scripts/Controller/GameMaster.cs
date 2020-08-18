@@ -21,6 +21,10 @@ public class GameMaster : MonoBehaviour
     public GameObject GetCardBox { get { return getCardBox; } }
     public bool GetCardButtonEnabled { set { getCardBoxButton.enabled = value; } get { return getCardBoxButton.enabled; } }
 
+    private AudioSource audioSource = null;
+    [SerializeField] private AudioClip bgmClip = null;
+    [SerializeField] private AudioClip seClip = null;
+
     private int gameTurn = 0;    // 経過ターン数
     private int limitTurn = 0;    // 設定した制限ターン数
     private int gamelimit = 0;    // ゲーム終了までのターン数
@@ -100,6 +104,9 @@ public class GameMaster : MonoBehaviour
         title.ButtonActionSet();
         MenuButtonActive(false);
         menuObject.SetActive(false);
+
+        audioSource = GetComponent<AudioSource>();
+        PlayBGM();
     }
 
     private void Update()
@@ -316,5 +323,25 @@ public class GameMaster : MonoBehaviour
         {
             menuButton.enabled = true;
         }
+    }
+
+    /// <summary>
+    /// BGMの再生
+    /// </summary>
+    public void PlayBGM()
+    {
+        if(audioSource == null) { return; }
+        audioSource.clip = bgmClip;
+        audioSource.loop = true;
+        audioSource.Play();
+    }
+
+    /// <summary>
+    /// SEの再生
+    /// </summary>
+    public void PlaySE()
+    {
+        if(audioSource == null) { return; }
+        audioSource.PlayOneShot(seClip);
     }
 }

@@ -39,6 +39,9 @@ public class CardView : CardData
         float speed = 500f;
         bool flag = true;
 
+        // SE再生
+        GameMaster.Instance.PlaySE();
+
         if (turnMode)
         {
             // カードをめくる処理
